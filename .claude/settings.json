@@ -11,7 +11,11 @@
       "Bash(git add .)",
       "Bash(git commit:*)",
       "Bash(alembic init alembic)",
-      "Bash(git add -A)"
+      "Bash(git add -A)",
+      "Bash(alembic revision --autogenerate -m \"initial models\")",
+      "Bash(sqlite3 /e/RSSWebReader/backend/rss.db \".tables\")",
+      "Bash(sqlite3 /e/RSSWebReader/backend/rss.db \".schema\")",
+      "Bash(sqlite3 rss.db \".tables\")"
     ]
   }
 }
