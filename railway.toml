@@ -1,0 +1,11 @@
+[build]
+builder = "NIXPACKS"
+
+# API Service
+[services.api]
+command = "uvicorn main:app --host 0.0.0.0 --port $PORT"
+env = ["PORT=$PORT"]
+
+# Worker Service
+[services.worker]
+command = "python -m app.tasks.scheduler"

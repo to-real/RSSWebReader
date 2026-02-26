@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -L \"https://t.co/dwAiIjlXet\" -o e:/RSSWebReader/feeds.opml)",
+      "Bash(curl -s \"https://gist.githubusercontent.com/emschwartz/e6d2bf860ccc367fe37ff953ba6de66b/raw/426957f043dc0054f95aae6c19de1d0b4ecc2bb2/hn-popular-blogs-2025.opml\" -o e:/RSSWebReader/feeds.opml)",
+      "Bash(python3 -c \":*)",
+      "Bash(curl -s -I \"https://simonwillison.net/atom/everything/\")",
+      "Bash(curl -s -I \"https://www.jeffgeerling.com/blog.xml\")",
+      "Bash(git add docs/plans/)",
+      "Bash(git commit -m \"fix: address critical bugs in implementation plan:*)",
+      "Bash(git add .)"
+    ]
+  }
+}

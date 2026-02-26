@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  api:
+    build: ./backend
+    ports: ["8000:8000"]
+    environment:
+      - DATABASE_URL=sqlite:///./rss.db
+    volumes:
+      - ./backend:/app
+
+  frontend:
+    build: ./frontend
+    ports: ["3000:3000"]
+    volumes:
+      - ./frontend:/app
