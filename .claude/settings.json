@@ -8,7 +8,10 @@
       "Bash(curl -s -I \"https://www.jeffgeerling.com/blog.xml\")",
       "Bash(git add docs/plans/)",
       "Bash(git commit -m \"fix: address critical bugs in implementation plan:*)",
-      "Bash(git add .)"
+      "Bash(git add .)",
+      "Bash(git commit:*)",
+      "Bash(alembic init alembic)",
+      "Bash(git add -A)"
     ]
   }
 }

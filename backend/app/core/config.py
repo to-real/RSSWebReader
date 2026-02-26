@@ -1,16 +1,18 @@
 from pydantic_settings import BaseSettings
-
+from functools import lru_cache
 
 class Settings(BaseSettings):
-    DATABASE_URL: str = "sqlite:///./rss.db"
-    CLAUDE_API_KEY: str = ""
-    FETCH_INTERVAL_MINUTES: int = 30
-    CLAUDE_MAX_CONCURRENCY: int = 3
-    CLAUDE_MAX_CONTENT_LENGTH: int = 3000
-    LOG_LEVEL: str = "INFO"
+    database_url: str
+    claude_api_key: str
+    fetch_interval_minutes: int = 30
+    claude_max_concurrency: int = 3
+    claude_max_content_length: int = 3000
+    log_level: str = "INFO"
+    sentry_dsn: str = ""
 
     class Config:
         env_file = ".env"
 
-
-settings = Settings()
+@lru_cache()
+def get_settings() -> Settings:
+    return Settings()
