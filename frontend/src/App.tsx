@@ -1,9 +1,27 @@
+import { useState } from 'react'
+import { Layout } from './components/Layout'
+import { Sidebar } from './components/Sidebar'
+import { ArticleList } from './components/ArticleList'
+
 function App() {
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [searchKeyword, setSearchKeyword] = useState('')
+
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <h1 className="text-2xl font-bold">RSS Web Reader</h1>
-      <p className="text-gray-600">Frontend setup complete</p>
-    </div>
+    <Layout onSearch={setSearchKeyword}>
+      <div className="flex flex-col md:flex-row">
+        <Sidebar
+          selectedCategory={selectedCategory}
+          onSelectCategory={setSelectedCategory}
+        />
+        <div className="flex-1">
+          <ArticleList
+            category={selectedCategory}
+            keyword={searchKeyword || undefined}
+          />
+        </div>
+      </div>
+    </Layout>
   )
 }
 
