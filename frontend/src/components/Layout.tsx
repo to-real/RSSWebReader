@@ -124,7 +124,7 @@ export function Layout({ children, onSearch }: LayoutProps) {
 
               {/* Feedback button */}
               <a
-                href="https://github.com/to-real/RSSWebReader/issues"
+                href="https://github.com/to-real/RSSWebReader/issues/new"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-ghost p-2.5 rounded-lg flex items-center gap-1.5"
