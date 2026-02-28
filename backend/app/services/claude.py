@@ -1,13 +1,16 @@
-import json
 import os
 from anthropic import AsyncAnthropic
 from tenacity import retry, stop_after_attempt, wait_exponential
 from app.core.config import get_settings
 from app.core import logger
+from app.services.base import BaseAIService
 
 settings = get_settings()
 
-class ClaudeService:
+
+class ClaudeService(BaseAIService):
+    """Claude/Zhipu AI service via Anthropic-compatible endpoint"""
+
     def __init__(self):
         # Support Zhipu via Anthropic-compatible endpoint
         api_key = settings.anthropic_api_key or os.getenv("ANTHROPIC_API_KEY") or settings.claude_api_key
@@ -17,34 +20,8 @@ class ClaudeService:
             api_key=api_key,
             base_url=base_url  # None uses default, or set to Zhipu's endpoint
         )
-        # Use appropriate model based on endpoint
-        if base_url and "bigmodel" in base_url:
-            self.model = "claude-3-5-sonnet-20241022"  # Zhipu maps this to their model
-        else:
-            self.model = "claude-3-5-sonnet-20241022"
-
-    def _build_prompt(self, article_title: str, article_content: str) -> str:
-        """Build prompt for article summarization"""
-        truncated = article_content[:settings.claude_max_content_length]
-        return f"""请阅读以下英文技术文章，生成中文摘要。
-
-标题：{article_title}
-正文：{truncated}
-
-请严格按以下 JSON 格式返回，不要包含其他内容：
-{{
-  "summary": "200字以内的中文摘要",
-  "one_liner": "一句话推荐理由，不超过30字",
-  "keywords": ["关键词1", "关键词2", "关键词3"]
-}}"""
-
-    def _parse_response(self, response_text: str) -> dict:
-        """Parse Claude response with defensive handling"""
-        text = response_text.strip()
-        # Remove markdown code blocks
-        if text.startswith("```"):
-            text = text.split("\n", 1)[1].rsplit("```", 1)[0]
-        return json.loads(text)
+        # Model name - Zhipu's Anthropic-compatible endpoint maps this internally
+        self.model = "claude-3-5-sonnet-20241022"
 
     @retry(wait=wait_exponential(min=1, max=60), stop=stop_after_attempt(5))
     async def summarize(self, title: str, content: str) -> dict:

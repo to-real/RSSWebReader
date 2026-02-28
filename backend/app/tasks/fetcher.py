@@ -34,13 +34,17 @@ class RSSFetcher:
         async with self.semaphore:
             try:
                 # Use requests in thread pool (better SSL on Windows)
-                # Some feeds have SSL issues, so we skip verification
+                # Per-feed SSL verification setting
+                verify_ssl = not getattr(feed, 'skip_ssl_verification', False)
+                if not verify_ssl:
+                    logger.warning("ssl_verification_skipped", feed_url=feed.url)
+
                 response = await asyncio.to_thread(
                     requests.get,
                     feed.url,
                     timeout=30,
                     headers={'User-Agent': 'RSS-Web-Reader/1.0'},
-                    verify=False  # Skip SSL verification for problematic feeds
+                    verify=verify_ssl
                 )
                 response.raise_for_status()
 

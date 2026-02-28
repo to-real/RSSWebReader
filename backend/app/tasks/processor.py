@@ -71,15 +71,18 @@ class AIProcessor:
 
         except Exception as e:
             logger.error("summary_failed", summary_id=summary_id, error=str(e))
-            db: Session = SessionLocal()
+            # Rollback the failed transaction first
+            db.rollback()
+            # Now update the status in a fresh transaction
             try:
                 summary = db.query(Summary).filter(Summary.id == summary_id).first()
                 if summary:
                     summary.status = "failed"
                     summary.error = str(e)
                     db.commit()
-            finally:
-                db.close()
+            except Exception as inner_e:
+                logger.error("summary_status_update_failed", summary_id=summary_id, error=str(inner_e))
+                db.rollback()
             return False
         finally:
             db.close()

@@ -71,11 +71,11 @@ def classify_feeds():
         batch = feeds[i:i+batch_size]
         print(f"\n📦 Batch {i//batch_size + 1}: {len(batch)} feeds")
 
+        db = SessionLocal()
         try:
             classification = asyncio.run(classify_batch(batch, claude))
 
             # Update database
-            db = SessionLocal()
             for f in batch:
                 if f.title in classification:
                     new_category = classification[f.title]
@@ -86,10 +86,12 @@ def classify_feeds():
                         print(f"  ✅ {f.title[:40]}... → {new_category}")
 
             db.commit()
-            db.close()
 
         except Exception as e:
             print(f"  ❌ Batch failed: {e}")
+            db.rollback()
+        finally:
+            db.close()
 
     # Final stats
     db = SessionLocal()

@@ -12,6 +12,7 @@ class Feed(Base):
     category = Column(String, nullable=True)
     source_type = Column(String, nullable=True)
     is_active = Column(Boolean, default=True)
+    skip_ssl_verification = Column(Boolean, default=False)  # Per-feed SSL bypass for problematic feeds
     fetch_interval_minutes = Column(Integer, default=30)
     last_fetched_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
