@@ -10,7 +10,8 @@ settings = get_settings()
 
 class AIProcessor:
     def __init__(self, max_concurrent: int = None):
-        self.claude = ClaudeService()
+        # Using ClaudeService which supports NewAPI/Zhipu compatibility
+        self.ai_service = ClaudeService()
         self.semaphore = asyncio.Semaphore(max_concurrent or settings.claude_max_concurrency)
 
     async def process_pending(self) -> None:
@@ -56,13 +57,13 @@ class AIProcessor:
                 db.commit()
                 return False
 
-            result = await self.claude.summarize(article.title, article.content or "")
+            result = await self.ai_service.summarize(article.title, article.content or "")
 
             summary.status = "completed"
             summary.summary_cn = result["summary"]
             summary.one_liner = result["one_liner"]
             summary.keywords = result["keywords"]
-            summary.model_version = "claude-3-5-sonnet"
+            summary.model_version = "claude-3-5-sonnet"  # Uses NewAPI endpoint
             db.commit()
 
             logger.info("summary_completed", article_id=article.id)

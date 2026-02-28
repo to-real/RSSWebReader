@@ -4,19 +4,19 @@ import { Sidebar } from './components/Sidebar'
 import { ArticleList } from './components/ArticleList'
 
 function App() {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [selectedFeedId, setSelectedFeedId] = useState<number | null>(null)
   const [searchKeyword, setSearchKeyword] = useState('')
 
   return (
     <Layout onSearch={setSearchKeyword}>
       <div className="flex flex-col md:flex-row">
         <Sidebar
-          selectedCategory={selectedCategory}
-          onSelectCategory={setSelectedCategory}
+          selectedFeedId={selectedFeedId}
+          onSelectFeed={setSelectedFeedId}
         />
         <div className="flex-1">
           <ArticleList
-            category={selectedCategory}
+            feedId={selectedFeedId}
             keyword={searchKeyword || undefined}
           />
         </div>

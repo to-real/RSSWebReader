@@ -13,6 +13,7 @@ async def list_articles(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
     feed_id: Optional[int] = None,
+    category: Optional[str] = None,
     keyword: Optional[str] = None,
     db: Session = Depends(get_db)
 ):
@@ -33,12 +34,20 @@ async def list_articles(
     if feed_id:
         query = query.filter(Article.feed_id == feed_id)
 
+    if category:
+        query = query.filter(Feed.category == category)
+
     if keyword:
         # MVP: title-only search (SQLite compatible)
         query = query.filter(Article.title.ilike(f"%{keyword}%"))
 
     total = query.count()
-    articles = query.order_by(Article.published_at.desc()).offset((page - 1) * page_size).limit(page_size).all()
+    # Order by: completed summaries first, then by published date (NULL=last)
+    from sqlalchemy import case, desc
+    articles = query.order_by(
+        case((Summary.status == 'completed', 0), else_=1).label('has_summary'),
+        desc(Article.published_at)
+    ).offset((page - 1) * page_size).limit(page_size).all()
 
     items = [
         ArticleListItem(
@@ -97,7 +106,12 @@ async def get_latest_articles(
 @router.get("/{id}", response_model=ArticleDetail)
 async def get_article(id: int, db: Session = Depends(get_db)):
     """Get article detail with summary"""
-    article = db.query(Article, Feed.title.label("feed_title"), Summary).join(
+    article = db.query(
+        Article,
+        Feed.title.label("feed_title"),
+        Feed.source_type.label("source_type"),
+        Summary,
+    ).join(
         Feed).outerjoin(
         Summary, Summary.article_id == Article.id
     ).filter(Article.id == id).first()
@@ -106,7 +120,7 @@ async def get_article(id: int, db: Session = Depends(get_db)):
         from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="Article not found")
 
-    a, feed_title, summary = article
+    a, feed_title, source_type, summary = article
 
     return ArticleDetail(
         id=a.id,
@@ -118,6 +132,7 @@ async def get_article(id: int, db: Session = Depends(get_db)):
         language=a.language,
         published_at=a.published_at,
         feed_title=feed_title,
+        source_type=source_type,
         summary_cn=summary.summary_cn if summary else None,
         one_liner=summary.one_liner if summary else None,
         keywords=summary.keywords if summary else [],

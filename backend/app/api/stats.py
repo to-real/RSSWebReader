@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 
 router = APIRouter()
 
-@router.get("/stats", response_model=StatsResponse)
+@router.get("/", response_model=StatsResponse)
 async def get_stats(db: Session = Depends(get_db)):
     """Get site statistics"""
     total_feeds = db.query(Feed).count()

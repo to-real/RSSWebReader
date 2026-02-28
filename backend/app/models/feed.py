@@ -10,6 +10,7 @@ class Feed(Base):
     title = Column(String, nullable=False)
     description = Column(String, nullable=True)
     category = Column(String, nullable=True)
+    source_type = Column(String, nullable=True)
     is_active = Column(Boolean, default=True)
     fetch_interval_minutes = Column(Integer, default=30)
     last_fetched_at = Column(DateTime, nullable=True)

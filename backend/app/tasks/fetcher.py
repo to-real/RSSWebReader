@@ -1,6 +1,6 @@
 import asyncio
-import httpx
 import feedparser
+import requests  # requests works better on Windows SSL than httpx
 from datetime import datetime
 from typing import Optional
 from sqlalchemy.orm import Session
@@ -21,20 +21,29 @@ class RSSFetcher:
             active_feeds = db.query(Feed).filter(Feed.is_active == True).all()
             logger.info("fetch_started", feed_count=len(active_feeds))
 
-            async with httpx.AsyncClient(timeout=30) as client:
-                tasks = [self._fetch_one(feed, client) for feed in active_feeds]
-                results = await asyncio.gather(*tasks, return_exceptions=True)
+            tasks = [self._fetch_one(feed) for feed in active_feeds]
+            results = await asyncio.gather(*tasks, return_exceptions=True)
 
             success_count = sum(1 for r in results if r is not None and not isinstance(r, Exception))
             logger.info("fetch_completed", success=success_count, total=len(active_feeds))
         finally:
             db.close()
 
-    async def _fetch_one(self, feed: Feed, client: httpx.Client) -> Optional[int]:
-        """Fetch single feed"""
+    async def _fetch_one(self, feed: Feed) -> Optional[int]:
+        """Fetch single feed using requests (sync) in thread pool"""
         async with self.semaphore:
             try:
-                response = await client.get(feed.url)
+                # Use requests in thread pool (better SSL on Windows)
+                # Some feeds have SSL issues, so we skip verification
+                response = await asyncio.to_thread(
+                    requests.get,
+                    feed.url,
+                    timeout=30,
+                    headers={'User-Agent': 'RSS-Web-Reader/1.0'},
+                    verify=False  # Skip SSL verification for problematic feeds
+                )
+                response.raise_for_status()
+
                 # feedparser is sync, run in thread
                 parsed = await asyncio.to_thread(feedparser.parse, response.content)
 
@@ -84,9 +93,11 @@ class RSSFetcher:
         db.add(article)
         db.flush()
 
-        # Create pending summary
-        summary = Summary(article_id=article.id, status="pending")
-        db.add(summary)
+        # Check if summary already exists (handle duplicate creation)
+        existing_summary = db.query(Summary).filter(Summary.article_id == article.id).first()
+        if not existing_summary:
+            summary = Summary(article_id=article.id, status="pending")
+            db.add(summary)
 
         return True
 

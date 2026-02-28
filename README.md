@@ -52,6 +52,7 @@ python -m app.tasks.scheduler
 ## Deployment
 
 See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
+See [docs/FEED_TAXONOMY.md](docs/FEED_TAXONOMY.md) for manual source classification workflow.
 
 ## License
 

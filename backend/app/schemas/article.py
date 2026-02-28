@@ -24,6 +24,7 @@ class ArticleDetail(BaseModel):
     summary_status: str = "pending"
     published_at: Optional[datetime] = None
     feed_title: str
+    source_type: Optional[str] = None
     author: Optional[str] = None
 
 class PaginatedArticlesResponse(BaseModel):

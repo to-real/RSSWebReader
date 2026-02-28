@@ -84,6 +84,11 @@ export function ArticleCard({ article }: ArticleCardProps) {
               <p className="text-gray-700">{detail.summary_cn}</p>
             </div>
           )}
+          {detail?.source_type && (
+            <div className="mt-2 text-xs text-gray-500">
+              Source type: {detail.source_type}
+            </div>
+          )}
         </div>
       )}
 

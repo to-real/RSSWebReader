@@ -18,6 +18,7 @@ async def list_feeds(db: Session = Depends(get_db)):
             title=f.title,
             description=f.description,
             category=f.category,
+            source_type=f.source_type,
             is_active=f.is_active,
             fetch_interval_minutes=f.fetch_interval_minutes,
             last_fetched_at=f.last_fetched_at,

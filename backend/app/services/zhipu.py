@@ -1,27 +1,25 @@
+"""
+Zhipu AI (BigModel) service for article summarization.
+Supports GLM-4 and other models via Zhipu AI API.
+"""
 import json
-import os
-from anthropic import AsyncAnthropic
+from zhipuai import AsyncZhipuAI
 from tenacity import retry, stop_after_attempt, wait_exponential
 from app.core.config import get_settings
 from app.core import logger
 
 settings = get_settings()
 
-class ClaudeService:
-    def __init__(self):
-        # Support Zhipu via Anthropic-compatible endpoint
-        api_key = settings.anthropic_api_key or os.getenv("ANTHROPIC_API_KEY") or settings.claude_api_key
-        base_url = settings.anthropic_base_url or os.getenv("ANTHROPIC_BASE_URL")
+class ZhipuService:
+    """Zhipu AI service for generating Chinese summaries"""
 
-        self.client = AsyncAnthropic(
-            api_key=api_key,
-            base_url=base_url  # None uses default, or set to Zhipu's endpoint
-        )
-        # Use appropriate model based on endpoint
-        if base_url and "bigmodel" in base_url:
-            self.model = "claude-3-5-sonnet-20241022"  # Zhipu maps this to their model
-        else:
-            self.model = "claude-3-5-sonnet-20241022"
+    def __init__(self):
+        api_key = getattr(settings, 'zhipu_api_key', None) or settings.claude_api_key
+        if not api_key or api_key == "your-claude-api-key-here":
+            raise ValueError("ZHIPU_API_KEY not configured in .env")
+
+        self.client = AsyncZhipuAI(api_key=api_key)
+        self.model = "glm-4-flash"  # Fast and cost-effective, or "glm-4" for higher quality
 
     def _build_prompt(self, article_title: str, article_content: str) -> str:
         """Build prompt for article summarization"""
@@ -39,7 +37,7 @@ class ClaudeService:
 }}"""
 
     def _parse_response(self, response_text: str) -> dict:
-        """Parse Claude response with defensive handling"""
+        """Parse Zhipu response with defensive handling"""
         text = response_text.strip()
         # Remove markdown code blocks
         if text.startswith("```"):
@@ -48,15 +46,19 @@ class ClaudeService:
 
     @retry(wait=wait_exponential(min=1, max=60), stop=stop_after_attempt(5))
     async def summarize(self, title: str, content: str) -> dict:
-        """Generate summary for article"""
+        """Generate summary for article using Zhipu AI"""
         prompt = self._build_prompt(title, content)
 
-        response = await self.client.messages.create(
+        response = await self.client.chat.completions.create(
             model=self.model,
+            messages=[
+                {"role": "system", "content": "你是一个专业的技术文章摘要助手，擅长将英文技术文章总结为简洁的中文摘要。"},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.3,
             max_tokens=1000,
-            messages=[{"role": "user", "content": prompt}]
         )
 
-        result = self._parse_response(response.content[0].text)
-        logger.info("claude_summary_generated", title=title)
+        result = self._parse_response(response.choices[0].message.content)
+        logger.info("zhipu_summary_generated", title=title, model=self.model)
         return result

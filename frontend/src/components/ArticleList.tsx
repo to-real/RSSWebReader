@@ -4,18 +4,19 @@ import { ArticleCard } from './ArticleCard'
 import { useState } from 'react'
 
 interface ArticleListProps {
-  category?: string | null
+  feedId?: number | null
   keyword?: string
 }
 
-export function ArticleList({ category, keyword }: ArticleListProps) {
+export function ArticleList({ feedId, keyword }: ArticleListProps) {
   const [page, setPage] = useState(1)
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['articles', page, category, keyword],
+    queryKey: ['articles', page, feedId, keyword],
     queryFn: () => articlesApi.list({
       page,
       page_size: 20,
+      feed_id: feedId || undefined,
       keyword: keyword || undefined,
     }).then(res => res.data),
   })

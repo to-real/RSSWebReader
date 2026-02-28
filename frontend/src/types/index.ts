@@ -14,6 +14,7 @@ export interface ArticleDetail extends Article {
   content_hash: string
   author: string | null
   language: string
+  source_type: string | null
   summary_cn: string | null
   summary_status: 'pending' | 'completed' | 'failed'
 }
@@ -32,6 +33,7 @@ export interface Feed {
   title: string
   description: string | null
   category: string | null
+  source_type: string | null
   is_active: boolean
   fetch_interval_minutes: number
   last_fetched_at: string | null

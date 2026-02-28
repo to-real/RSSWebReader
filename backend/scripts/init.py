@@ -2,8 +2,13 @@
 """
 Initialize the RSS Web Reader database and data.
 """
-import asyncio
+import sys
 from pathlib import Path
+
+# Add parent directory to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+import asyncio
 from sqlalchemy.orm import Session
 from app.core.db import SessionLocal, engine
 from app.models import Feed

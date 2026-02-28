@@ -8,6 +8,7 @@ class FeedBase(BaseModel):
     title: str
     description: Optional[str] = None
     category: Optional[str] = None
+    source_type: Optional[str] = None
     fetch_interval_minutes: int = 30
 
 
