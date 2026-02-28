@@ -19,32 +19,44 @@ export function ArticleCard({ article }: ArticleCardProps) {
   })
 
   const formatDate = (dateStr: string | null) => {
-    if (!dateStr) return ''
+    if (!dateStr) return '未知时间'
     return formatDistanceToNow(new Date(dateStr), { addSuffix: true, locale: zhCN })
   }
 
   return (
-    <article className="border-b border-gray-200 py-4">
+    <article className="article-card animate-fade-in">
       {/* Title */}
       <a
         href={article.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-lg font-semibold text-gray-900 hover:text-blue-600"
+        className="block group"
       >
-        {article.title}
+        <h3
+          className="text-lg font-semibold leading-snug transition-colors duration-200 font-serif"
+          style={{ color: 'var(--fg-primary)' }}
+        >
+          <span className="group-hover:text-[var(--accent)] transition-colors duration-200">
+            {article.title}
+          </span>
+        </h3>
       </a>
 
       {/* One-liner */}
       {article.one_liner && (
-        <p className="text-sm text-gray-600 mt-1">{article.one_liner}</p>
+        <p
+          className="mt-2 text-sm leading-relaxed"
+          style={{ color: 'var(--fg-secondary)' }}
+        >
+          {article.one_liner}
+        </p>
       )}
 
       {/* Keywords */}
       {article.keywords.length > 0 && (
-        <div className="flex flex-wrap gap-2 mt-2">
-          {article.keywords.map(kw => (
-            <span key={kw} className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">
+        <div className="flex flex-wrap gap-1.5 mt-3">
+          {article.keywords.slice(0, 5).map(kw => (
+            <span key={kw} className="tag">
               {kw}
             </span>
           ))}
@@ -54,47 +66,93 @@ export function ArticleCard({ article }: ArticleCardProps) {
       {/* Expand button */}
       <button
         onClick={() => setExpanded(!expanded)}
-        className="text-sm text-blue-500 mt-2 hover:underline"
+        className="mt-3 text-sm font-medium flex items-center gap-1.5 transition-colors duration-200"
+        style={{ color: 'var(--accent)' }}
       >
-        {expanded ? '收起' : '展开摘要'}
+        <svg
+          className={`w-4 h-4 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+        {expanded ? '收起摘要' : '展开摘要'}
       </button>
 
       {/* Expanded summary */}
       {expanded && (
-        <div className="mt-2">
+        <div className="mt-4 animate-fade-in">
           {isLoading && (
-            <div className="bg-yellow-50 p-3 rounded text-sm text-yellow-700">
-              ⏳ AI 正在生成摘要...
+            <div className="flex items-center gap-3 p-4 rounded-xl" style={{ background: 'var(--bg-tertiary)' }}>
+              <div className="w-5 h-5 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
+              <span className="text-sm" style={{ color: 'var(--fg-secondary)' }}>
+                AI 正在生成摘要...
+              </span>
             </div>
           )}
           {detail && detail.summary_status === 'pending' && (
-            <div className="bg-yellow-50 p-3 rounded text-sm text-yellow-700">
-              ⏳ AI 摘要生成中，通常需要几分钟
+            <div className="flex items-center gap-3 p-4 rounded-xl" style={{ background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)' }}>
+              <span className="text-lg">⏳</span>
+              <span className="text-sm" style={{ color: '#92400e' }}>
+                AI 摘要生成中，通常需要几分钟
+              </span>
             </div>
           )}
           {detail && detail.summary_status === 'failed' && (
-            <div className="bg-red-50 p-3 rounded text-sm text-red-700">
-              ⚠️ 摘要生成失败，稍后会自动重试
+            <div className="flex items-center gap-3 p-4 rounded-xl" style={{ background: 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)' }}>
+              <span className="text-lg">⚠️</span>
+              <span className="text-sm" style={{ color: '#991b1b' }}>
+                摘要生成失败，稍后会自动重试
+              </span>
             </div>
           )}
           {detail && detail.summary_status === 'completed' && detail.summary_cn && (
-            <div className="bg-gray-50 p-3 rounded text-sm">
-              <p className="font-semibold mb-1">💡 一句话推荐</p>
-              <p className="text-gray-600 mb-2">{detail.one_liner}</p>
-              <p className="text-gray-700">{detail.summary_cn}</p>
+            <div className="summary-box">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-base">💡</span>
+                <span className="text-sm font-semibold" style={{ color: 'var(--fg-primary)' }}>
+                  AI 摘要
+                </span>
+              </div>
+              <p className="text-sm leading-relaxed" style={{ color: 'var(--fg-primary)' }}>
+                {detail.summary_cn}
+              </p>
+              {detail.one_liner && (
+                <p className="mt-2 text-sm italic" style={{ color: 'var(--fg-secondary)' }}>
+                  「{detail.one_liner}」
+                </p>
+              )}
             </div>
           )}
           {detail?.source_type && (
-            <div className="mt-2 text-xs text-gray-500">
-              Source type: {detail.source_type}
+            <div className="mt-3 flex items-center gap-2 text-xs" style={{ color: 'var(--fg-tertiary)' }}>
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+              <span>{detail.source_type}</span>
             </div>
           )}
         </div>
       )}
 
       {/* Meta */}
-      <div className="text-xs text-gray-400 mt-2">
-        {article.feed_title} · {formatDate(article.published_at)}
+      <div className="flex items-center gap-3 mt-4 pt-3 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
+        <div className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--fg-tertiary)' }}>
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span>{formatDate(article.published_at)}</span>
+        </div>
+        {article.feed_title && (
+          <div className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--fg-tertiary)' }}>
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 5c7.18 0 13 5.82 13 13M6 11a7 7 0 017 7m-6 0a1 1 0 11-2 0 1 1 0 012 0z" />
+            </svg>
+            <span>{article.feed_title}</span>
+          </div>
+        )}
       </div>
     </article>
   )

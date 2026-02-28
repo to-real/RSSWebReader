@@ -9,17 +9,17 @@ function App() {
 
   return (
     <Layout onSearch={setSearchKeyword}>
-      <div className="flex flex-col md:flex-row">
+      <div className="flex flex-col md:flex-row min-h-[calc(100vh-4rem)]">
         <Sidebar
           selectedFeedId={selectedFeedId}
           onSelectFeed={setSelectedFeedId}
         />
-        <div className="flex-1">
+        <main className="flex-1 min-w-0" style={{ background: 'var(--bg-primary)' }}>
           <ArticleList
             feedId={selectedFeedId}
             keyword={searchKeyword || undefined}
           />
-        </div>
+        </main>
       </div>
     </Layout>
   )
