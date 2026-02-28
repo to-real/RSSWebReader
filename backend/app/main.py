@@ -4,7 +4,7 @@ RSS Web Reader API - Main FastAPI Application
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import get_settings
-from app.api import health, articles, feeds, stats
+from app.api import health, articles, feeds, stats, recommendations
 
 def create_app() -> FastAPI:
     """Create and configure FastAPI application"""
@@ -30,6 +30,7 @@ def create_app() -> FastAPI:
     app.include_router(articles.router, prefix="/api/articles", tags=["articles"])
     app.include_router(feeds.router, prefix="/api/feeds", tags=["feeds"])
     app.include_router(stats.router, prefix="/api/stats", tags=["stats"])
+    app.include_router(recommendations.router, prefix="/api/recommendations", tags=["recommendations"])
 
     logger.info("app_started", version="1.0.0")
     return app
