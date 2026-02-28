@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     claude_max_content_length: int = 3000
     log_level: str = "INFO"
     sentry_dsn: str = ""
+    frontend_url: str = "http://localhost:3000"  # Frontend URL for CORS
 
     model_config = SettingsConfigDict(env_file=".env")
 

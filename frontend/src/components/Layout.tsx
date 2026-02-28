@@ -51,7 +51,7 @@ export function Layout({ children, onSearch }: LayoutProps) {
             <div className="flex-1 max-w-md mx-8">
               <div className="relative">
                 <svg
-                  className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none"
                   style={{ color: 'var(--fg-tertiary)' }}
                   fill="none"
                   viewBox="0 0 24 24"
@@ -65,15 +65,24 @@ export function Layout({ children, onSearch }: LayoutProps) {
                   placeholder="搜索文章标题或关键词..."
                   value={searchInput}
                   onChange={e => setSearchInput(e.target.value)}
-                  className="input w-full pl-10 pr-4 py-2.5"
+                  onFocus={(e) => e.target.style.boxShadow = 'inset 0 0 0 1.5px var(--accent)'}
+                  onBlur={(e) => e.target.style.boxShadow = 'inset 0 0 0 1px var(--border)'}
+                  className="w-full py-2.5 pl-10 pr-10 text-sm rounded-xl border-none outline-none transition-shadow placeholder:text-[var(--fg-tertiary)]"
+                  style={{
+                    background: 'var(--bg-secondary)',
+                    color: 'var(--fg-primary)',
+                    boxShadow: 'inset 0 0 0 1px var(--border)',
+                  }}
                 />
                 {searchInput && (
                   <button
                     onClick={() => setSearchInput('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-md hover:bg-[var(--bg-tertiary)] transition-colors"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-colors"
                     style={{ color: 'var(--fg-tertiary)' }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-tertiary)'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                   >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>

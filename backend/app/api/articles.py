@@ -57,6 +57,7 @@ async def list_articles(
             one_liner=a.one_liner,
             keywords=a.keywords or [],
             published_at=a.Article.published_at,
+            created_at=a.Article.created_at,
             feed_title=a.feed_title,
             feed_category=a.feed_category,
         )
@@ -97,6 +98,7 @@ async def get_latest_articles(
             one_liner=a.one_liner,
             keywords=a.keywords or [],
             published_at=a.Article.published_at,
+            created_at=a.Article.created_at,
             feed_title=a.feed_title,
             feed_category=a.feed_category,
         )

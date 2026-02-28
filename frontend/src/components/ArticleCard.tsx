@@ -18,7 +18,9 @@ export function ArticleCard({ article }: ArticleCardProps) {
     enabled: expanded,
   })
 
-  const formatDate = (dateStr: string | null) => {
+  const formatDate = (publishedAt: string | null, createdAt: string) => {
+    // Use published_at if available, otherwise fall back to created_at
+    const dateStr = publishedAt || createdAt
     if (!dateStr) return '未知时间'
     return formatDistanceToNow(new Date(dateStr), { addSuffix: true, locale: zhCN })
   }
@@ -143,7 +145,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
-          <span>{formatDate(article.published_at)}</span>
+          <span>{formatDate(article.published_at, article.created_at)}</span>
         </div>
         {article.feed_title && (
           <div className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--fg-tertiary)' }}>

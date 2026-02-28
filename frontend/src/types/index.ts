@@ -5,6 +5,7 @@ export interface Article {
   one_liner: string | null
   keywords: string[]
   published_at: string | null
+  created_at: string  // fallback for time display
   feed_title: string
   feed_category: string | null
 }

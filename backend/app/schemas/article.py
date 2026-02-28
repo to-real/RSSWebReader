@@ -9,6 +9,7 @@ class ArticleListItem(BaseModel):
     one_liner: Optional[str] = None
     keywords: List[str] = []
     published_at: Optional[datetime] = None
+    created_at: datetime  # Fallback for display
     feed_title: str
     feed_category: Optional[str] = None
 

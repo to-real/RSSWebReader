@@ -3,21 +3,23 @@ RSS Web Reader API - Main FastAPI Application
 """
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.core import logger
+from app.core.config import get_settings
 from app.api import health, articles, feeds, stats
 
 def create_app() -> FastAPI:
     """Create and configure FastAPI application"""
+    settings = get_settings()
+
     app = FastAPI(
         title="RSS Web Reader API",
         description="AI-powered RSS feed aggregator with Chinese summaries",
         version="1.0.0"
     )
 
-    # CORS middleware for frontend
+    # CORS middleware for frontend - use environment variable
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost:5173", "http://localhost:3000"],  # Vite dev server
+        allow_origins=[settings.frontend_url],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
