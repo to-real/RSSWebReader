@@ -16,10 +16,19 @@ def create_app() -> FastAPI:
         version="1.0.0"
     )
 
-    # CORS middleware for frontend - use environment variable
+    # CORS middleware for frontend - allow localhost ports for development
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[settings.frontend_url],
+        allow_origins=[
+            "http://localhost:3000",
+            "http://localhost:3001",
+            "http://localhost:3002",
+            "http://localhost:3003",
+            "http://127.0.0.1:3000",
+            "http://127.0.0.1:3001",
+            "http://127.0.0.1:3002",
+            "http://127.0.0.1:3003",
+        ],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -32,7 +41,6 @@ def create_app() -> FastAPI:
     app.include_router(stats.router, prefix="/api/stats", tags=["stats"])
     app.include_router(recommendations.router, prefix="/api/recommendations", tags=["recommendations"])
 
-    logger.info("app_started", version="1.0.0")
     return app
 
 # Create app instance
